@@ -5,15 +5,24 @@ import Footer from "./components/common/Footer";
 import SignInForm from "./components/auth/SignInForm";
 import SignUpForm from "./components/auth/SignUpForm";
 import { AuthProvider, useAuthContext } from "./contexts/AuthContext";
-import ProductList from "./wireframe/ProductList";
 import Cart from "./wireframe/Cart";
 import Wishlist from "./wireframe/Wishlist";
 import { useAuth } from "./hooks/useAuth";
+import ScrollToShipThemes from "./components/common/ScrollToShipThemes";
+import { CartProvider } from "./contexts/CartContext";
+
+function NotFound() {
+  return (
+    <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontSize: 32, color: '#dc3545', fontWeight: 700 }}>
+      404 Not Found
+    </div>
+  );
+}
 
 function Home() {
   return (
-    <div style={{ minHeight: '80vh', overflowY: 'auto', padding: '2rem' }}>
-      <ProductList />
+    <div style={{ minHeight: '80vh', overflowY: 'auto', padding: 0 }}>
+      <ScrollToShipThemes />
     </div>
   );
 }
@@ -51,19 +60,22 @@ function Profile() {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Header />
-        <div style={{ minHeight: '80vh' }}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/signin" element={<SignInForm />} />
-            <Route path="/signup" element={<SignUpForm />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/cart" element={<Cart />} />
-          </Routes>
-        </div>
-        <Footer />
-      </Router>
+      <CartProvider>
+        <Router>
+          <Header />
+          <div style={{ minHeight: '80vh' }}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/signin" element={<SignInForm />} />
+              <Route path="/signup" element={<SignUpForm />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
+          <Footer />
+        </Router>
+      </CartProvider>
     </AuthProvider>
   );
 }

@@ -1,7 +1,7 @@
 import '../../styles/Header.css'
 import { FiShoppingCart as CartButton } from "react-icons/fi";
 import { CgProfile as ProfileButton} from "react-icons/cg";
-import { FaSearch as SearchIcon} from "react-icons/fa";
+import { FaSearch as SearchIcon } from "react-icons/fa";
 import Logo from "../../assets/images/AppLogo3D.png";
 import Title from "../../assets/images/AppTitle3D.png";
 import { useNavigate } from 'react-router-dom';
@@ -27,9 +27,9 @@ export default function Header()
                     <ProfileButton size={35}/>   
                 </button>
                 <div className='SearchBox' >
-                    <input name='SearchInput' id='searchinput' placeholder='Search'/>
-                    <button style={{right:12}}>
-                        <SearchIcon size={25} style={{color:"rgba(0, 0, 0, 0.75)"} }/>
+                    <input name='SearchInput' id='searchinput' placeholder='Search' style={{flex: 1, minWidth: 0}}/>
+                    <button type="button" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%'}}>
+                        <SearchIcon size={28} style={{color: "#000"}}/>
                     </button>
                 </div>
             </div>

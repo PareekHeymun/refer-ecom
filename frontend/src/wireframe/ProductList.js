@@ -3,6 +3,7 @@ import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../hooks/useCart';
 import { useWishlist } from '../hooks/useWishlist';
 import { useAuthContext } from '../contexts/AuthContext';
+import heartIcon from '../images/heartIcon.png';
 
 export default function ProductList() {
   const { products, loading, error } = useProducts();
@@ -72,15 +73,28 @@ export default function ProductList() {
                 <button 
                   onClick={() => handleAddToWishlist(product._id)}
                   style={{
-                    padding: '0.5rem 1rem',
+                    padding: '0.5rem',
                     background: '#dc3545',
                     color: 'white',
                     border: 'none',
                     borderRadius: '4px',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '40px',
+                    height: '40px'
                   }}
                 >
-                  Add to Wishlist
+                  <img 
+                    src={heartIcon} 
+                    alt="Add to Wishlist" 
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      filter: 'brightness(0) invert(1)'
+                    }}
+                  />
                 </button>
               </div>
             </div>

@@ -7,15 +7,29 @@
     display:flex;
     align-items: center;
 }
-button{
+/* Only header nav buttons are absolute */
+.HeaderPortion > button {
     background: transparent;
     border: transparent;
     padding: 0;
     position: absolute;
     cursor: pointer;
 }
+
+/* SearchBox button is static and does not overlap input */
+.SearchBox button {
+    position: static;
+    background: transparent;
+    border: none;
+    padding: 0 0 0 10px;
+    cursor: pointer;
+}
+
+/* Existing styles */
 .LogoTitle button{
     position: static;
+    background: transparent;
+    border: none;
 }
 .LogoTitle {
     display: flex;
@@ -24,21 +38,29 @@ button{
     gap: 5px; 
 }
 .SearchBox{
-    height:parent;
-    width:260px;
-    position:absolute;
+    height: 50px;
+    width: 260px;
+    position: absolute;
     right: 90px;
-    display:flex;
-    flex-direction: row-reverse;
-    align-items: center ;
-    background-color: #F5F5F5;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 25px;
+    border: 1.5px solid #bbb;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 .SearchBox input{
-    height:50px;
-    width:260px;
-    background-color: transparent;
-    border: transparent;
+    height: 100%;
+    flex: 1;
+    background: transparent;
+    border: none;
     font-size: 20px;
+    border-radius: 25px;
+    padding: 0 16px;
+    outline: none;
+    z-index: 1;
 }
 
 

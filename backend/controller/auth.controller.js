@@ -2,26 +2,42 @@ const userModel = require('../models/user.model');
 const jwt = require('jsonwebtoken');
 const { ApiError } = require('../utils/ApiError.util');
 const { asyncHandler } = require('../utils/asyncHandler.util');
+const { getCookieOptions } = require('../utils/cookieOptions');
 
 const signup = asyncHandler(async function (req, res){
     const {name, email, password, role} = req.body;
     if(!name || !email || !password){
         throw new ApiError(400, 'Missing required fields');
     }
-    
+    // Email domain validation
+    const emailLower = email.toLowerCase();
+    if (!(/@gmail\.com$/.test(emailLower) || /@iiitm\.ac\.in$/.test(emailLower))) {
+        throw new ApiError(400, 'Email must end with @gmail.com or @iiitm.ac.in');
+    }
+    // Password length validation
+    if (password.length < 8) {
+        throw new ApiError(400, 'Password must be at least 8 characters long');
+    }
     // Validate role
     const validRoles = ['buyer', 'seller'];
     if (role && !validRoles.includes(role)) {
         throw new ApiError(400, 'Invalid role. Must be either "buyer" or "seller"');
     }
-    
-    const existingUser = await userModel.findOne({ email });
-    if(existingUser){
-        throw new ApiError(400, 'User with this email already exists');
+    try {
+        const existingUser = await userModel.findOne({ email });
+        if(existingUser){
+            throw new ApiError(400, 'User with this email already exists');
+        }
+        const new_user = new userModel({name, email, password, role: role || 'buyer'});
+        await new_user.save();
+        res.status(201).json({msg: 'User registered successfully. Please log in.'});
+    } catch (err) {
+        // If it's a MongoDB connection error
+        if (err.name && (err.name === 'MongoNetworkError' || err.message?.includes('failed to connect'))) {
+            throw new ApiError(503, 'Internet issue, please try again');
+        }
+        throw err;
     }
-    const new_user = new userModel({name, email, password, role: role || 'buyer'});
-    await new_user.save();
-    res.status(201).json({msg: 'User registered successfully'});
 });
 
 const signin = asyncHandler(async function(req, res){
@@ -45,17 +61,19 @@ const signin = asyncHandler(async function(req, res){
     const GET_TOKEN = jwt.sign(payload_object, secret_key, options_object);
     // Set JWT in HTTP-only cookie
     res.cookie('token', GET_TOKEN, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        ...getCookieOptions(),
         maxAge: 60 * 60 * 1000 // 1 hour
     });
     res.status(200).json({msg: 'Login successful'});
 });
 
 const logout = asyncHandler(async (req, res) => {
-    // Clear the JWT cookie
-    res.clearCookie('token');
+    // Clear the JWT cookie with robust options
+    res.clearCookie('token', {
+        ...getCookieOptions(),
+        expires: new Date(0),
+        maxAge: 0
+    });
     res.status(200).json({msg: 'Logout successful'});
 });
 

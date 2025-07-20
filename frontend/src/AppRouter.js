@@ -6,6 +6,7 @@ import Cart from './components/Cart';
 import Wishlist from './components/Wishlist';
 import Orders from './components/Orders';
 import Auth from './components/Auth';
+import ProductDetails from './components/ProductDetails';
 
 export default function AppRouter() {
   return (
@@ -16,6 +17,7 @@ export default function AppRouter() {
       <Route path="/wishlist" element={<Wishlist />} />
       <Route path="/orders" element={<Orders />} />
       <Route path="/auth" element={<Auth />} />
+      <Route path="/product/:id" element={<ProductDetails />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );

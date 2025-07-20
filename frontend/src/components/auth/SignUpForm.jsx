@@ -3,8 +3,10 @@ import SignUp from "../../assets/images/SignUp.png";
 import '../../styles/SignUpForm.css'
 import Title from '../../assets/images/AppTitle3D.png'
 import { useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { FaUser, FaEnvelope, FaLock, FaStore } from 'react-icons/fa';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function SignUpForm(){
     const navigate = useNavigate();
@@ -12,47 +14,91 @@ export default function SignUpForm(){
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [role, setRole] = useState("buyer");
     const [submitting, setSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
+    const { showNotification } = useNotification();
 
     const onSubmit = async (e) => {
         e.preventDefault();
+        // Email domain validation
+        const emailLower = email.toLowerCase();
+        if (!(/@gmail\.com$/.test(emailLower) || /@iiitm\.ac\.in$/.test(emailLower))) {
+            showNotification('Email must end with @gmail.com or @iiitm.ac.in', 'error');
+            setSubmitting(false);
+            return;
+        }
+        // Password length validation
+        if (password.length < 8) {
+            showNotification('Password must be at least 8 characters long', 'error');
+            setSubmitting(false);
+            return;
+        }
         setSubmitting(true);
-        await handleSignup({ name, email, password });
+        await handleSignup({ name, email, password, role });
         setSubmitting(false);
         setSuccess(true);
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (success && !error) {
-            navigate('/signin');
+            showNotification('Signup successful! Please log in.', 'success');
+            // Do NOT auto-redirect to /signin
         }
-    }, [success, error, navigate]);
+    }, [success, error, showNotification]);
+
+    useEffect(() => {
+        if (error) {
+            showNotification(error, 'error');
+        }
+    }, [error, showNotification]);
 
     return(
-            <>
-                    <div className='Body'>
-                            <img src={SignUp} alt="Cart and Laptop" style={{height:"700px",width:"500px",marginLeft:"30px"}}/>
-                            <div style={{height:"700px",width:"250px"}}/>
-                            <div style={{height:"700px",width:"400px",display:'flex',alignItems:'center'}}>
-                                <form className="SignUpDetails" onSubmit={onSubmit}>
-                                    <div style={{display:'flex',flexDirection:'row', alignItems:'center', justifyContent:'Center'}}>
-                                        <p style={{fontSize:"20px", fontFamily:"sans-serif", marginRight:"8px", transform:'translateY(-2px)'}}>Create Account to use  </p>
-                                        <img src={Title} alt="Title" height="125px" width="125px" />
-                                    </div>
-                                    <p style={{fontSize:"20px",marginBotton:"50px", transform:'translateY(-30px)'}}>Enter your details below</p>
-                                    <input name="name" placeholder='Name' value={name} onChange={e => setName(e.target.value)} required />
-                                    <input type="email" name="email" placeholder='Email' value={email} onChange={e => setEmail(e.target.value)} required />
-                                    <input type="password" name="password" placeholder='Password' value={password} onChange={e => setPassword(e.target.value)} required />
-                                    <button id="SubmitButton" type="submit" disabled={submitting || loading}> Sign Up </button>
-                                    {error && <div style={{color: 'red', marginTop: 8}}>{error}</div>}
-                                    <span style={{marginTop:'20px'}}>
-                                        <p style={{display:'inline'}}>Become a seller by</p>
-                                        <p style={{display:'inline',fontWeight:'bold',marginLeft:'8px', color:'#E07575', cursor:'pointer'}} onClick={() => navigate('/signin')}>Registering here</p>
-                                    </span>
-                                </form>
-                            </div>
-                    </div>
-                </>
+        <div className="signup-outer-container">
+            {/* Website title image removed as requested */}
+            <div className='Body'>
+                <div className="signup-img-col">
+                    <img src={SignUp} alt="Cart and Laptop" className="signup-side-img"/>
+                </div>
+                <div className="signup-form-col">
+                    <form className="SignUpDetails" onSubmit={onSubmit} autoComplete="off">
+                        <h2 className="signup-heading">Sign Up</h2>
+                        <p className="signup-subheading">Create your account to use Scroll2Ship</p>
+                        <div className="signup-input-row">
+                            <FaUser className="signup-input-icon" />
+                            <input name="name" placeholder='Name' value={name} onChange={e => setName(e.target.value)} required />
+                        </div>
+                        <div className="signup-input-row">
+                            <FaEnvelope className="signup-input-icon" />
+                            <input type="email" name="email" placeholder='Email' value={email} onChange={e => setEmail(e.target.value)} required />
+                        </div>
+                        <div className="signup-input-row">
+                            <FaLock className="signup-input-icon" />
+                            <input type="password" name="password" placeholder='Password' value={password} onChange={e => setPassword(e.target.value)} required />
+                        </div>
+                        <div className="signup-input-row" style={{marginBottom: 18, alignItems: 'center'}}>
+                            <FaStore className="signup-input-icon" />
+                            <label style={{marginRight: 10, fontWeight: 600}}>Sign up as:</label>
+                            <select name="role" value={role} onChange={e => setRole(e.target.value)} style={{padding: '0.5rem', borderRadius: 6, border: '1.5px solid #bbb', fontSize: 16}}>
+                                <option value="buyer">Buyer</option>
+                                <option value="seller">Seller</option>
+                            </select>
+                        </div>
+                        <button id="SubmitButton" type="submit" disabled={submitting || loading}>
+                            {submitting ? 'Signing up...' : 'Sign Up'}
+                        </button>
+                        {/* Error notification now handled globally */}
+                        <span className="signup-login-link">
+                            <p style={{display:'inline'}}>Already have an account?</p>
+                            <p style={{display:'inline',fontWeight:'bold',marginLeft:'8px', color:'#E07575', cursor:'pointer'}} onClick={() => navigate('/signin')}>Login here</p>
+                        </span>
+                    </form>
+                </div>
+            </div>
+            <div className="signup-bottom-info">
+                <h3>Login/Signup</h3>
+                <p>Welcome to Scroll2Ship! Please sign up or log in to access all features and enjoy a seamless shopping experience.</p>
+            </div>
+        </div>
     )
 }

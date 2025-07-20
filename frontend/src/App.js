@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
@@ -10,6 +10,9 @@ import Wishlist from "./wireframe/Wishlist";
 import { useAuth } from "./hooks/useAuth";
 import ScrollToShipThemes from "./components/common/ScrollToShipThemes";
 import { CartProvider } from "./contexts/CartContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
+import { useCartStore } from "./store/cartStore";
+import { useWishlistStore } from "./store/wishlistStore";
 
 function NotFound() {
   return (
@@ -57,10 +60,25 @@ function Profile() {
   );
 }
 
-function App() {
+function AppProviders() {
+  const { hydrated: cartHydrated, hydrate: hydrateCart } = useCartStore();
+  const { hydrated: wishlistHydrated, hydrate: hydrateWishlist } = useWishlistStore();
+  const { user, loading: authLoading } = useAuthContext();
+
+  useEffect(() => {
+    if (!authLoading && user && !cartHydrated) {
+      hydrateCart();
+    }
+    if (!authLoading && user && !wishlistHydrated) {
+      hydrateWishlist();
+    }
+    // Only hydrate once per session/app load
+    // eslint-disable-next-line
+  }, [authLoading, user, cartHydrated, wishlistHydrated]);
+
   return (
-    <AuthProvider>
-      <CartProvider>
+    <CartProvider>
+      <NotificationProvider>
         <Router>
           <Header />
           <div style={{ minHeight: '80vh' }}>
@@ -75,7 +93,15 @@ function App() {
           </div>
           <Footer />
         </Router>
-      </CartProvider>
+      </NotificationProvider>
+    </CartProvider>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppProviders />
     </AuthProvider>
   );
 }

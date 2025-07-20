@@ -15,15 +15,19 @@ const userCollection = require('./models/user.model.js');
 const errhandler = require('./middleware/errhandler.middleware.js');
 
 const express = require('express');
-const rateLimit = require('./middleware/rateLimit.middleware.js');
-const cors = require('cors');
+// const rateLimit = require('./middleware/rateLimit.middleware.js');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 const app = express();
-app.use(rateLimit); // Apply rate limiting to all requests
+
+// Enable CORS for local development
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+
+// Disable rate limiting for development
+// app.use(rateLimit); // Apply rate limiting to all requests
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);

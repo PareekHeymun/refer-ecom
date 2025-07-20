@@ -23,7 +23,7 @@ router.post('/signin',
   authController.signin
 );
 
-router.post('/logout', auth_middleware, authController.logout);
+router.post('/logout', authController.logout);
 router.get('/profile', auth_middleware, authController.profile);
 
 module.exports = router;

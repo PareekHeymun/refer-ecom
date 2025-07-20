@@ -12,10 +12,11 @@ const authFunction = function(req, res, next){
     try{
         const decoded_verification_status = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded_verification_status;
-        console.log('User decoding success', req.user);
+        // Do not log sensitive user or token details
         next();
     }catch(err){
-        console.log(err);
+        // Optionally log only error type, not sensitive details
+        // console.log('JWT verification error:', err.name);
         return next(new ApiError(400, 'Invalid or expired token'));
     }
 }
